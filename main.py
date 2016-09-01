@@ -8,6 +8,17 @@ import imutils
 import cv2
 import sys
  
+
+def detectPeople():
+    (people, weights) = hog.detectMultiScale(
+        image,
+        winStride=(4, 4),
+        padding=(8, 8),
+        scale=1.05
+    )
+    return people
+
+
 # initialize the HOG descriptor/person detector
 hog = cv2.HOGDescriptor()
 hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
@@ -24,8 +35,7 @@ while True:
     orig = image.copy()
 
     # detect people in the image
-    (people, weights) = hog.detectMultiScale(image, winStride=(4, 4),
-        padding=(8, 8), scale=1.05)
+    people = detectPeople()
 
     # Detect faces
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
