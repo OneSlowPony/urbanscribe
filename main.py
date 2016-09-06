@@ -28,16 +28,16 @@ while True:
         padding=(8, 8), scale=1.05)
 
     # Detect faces
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    faces = faceCascade.detectMultiScale(
-        gray,
-        scaleFactor=1.1,
-        minNeighbors=5,
-        minSize=(30, 30),
-        flags=cv2.cv.CV_HAAR_SCALE_IMAGE
-    )
+    # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # faces = faceCascade.detectMultiScale(
+    #     gray,
+    #     scaleFactor=1.1,
+    #     minNeighbors=5,
+    #     minSize=(30, 30),
+    #     flags=cv2.cv.CV_HAAR_SCALE_IMAGE
+    # )
 
-    objects = faces
+    objects = people
 
     # draw the original bounding boxes
     for (x, y, w, h) in objects:
