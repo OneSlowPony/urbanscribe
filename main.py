@@ -7,12 +7,20 @@ import argparse
 import imutils
 import cv2
 import sys
- 
+import json
+
+
+def prettyJSON(d):
+    return json.dumps(d, sort_keys=True, indent=4, separators=(',', ': '))
+
 # initialize the HOG descriptor/person detector
 hog = cv2.HOGDescriptor()
 hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 
 imagePath = "images/jake.jpg"
+
+track = "faces"
+
 # load the image and resize it to (1) reduce detection time
 # and (2) improve detection accuracy
 
@@ -20,29 +28,30 @@ cascPath = "haarcascade_frontalface_default.xml"
 faceCascade = cv2.CascadeClassifier(cascPath)
 
 video_capture = cv2.VideoCapture(0)
-while True:
-    # Capture frame-by-frame
-    ret, frame = video_capture.read()
 
-    image = imutils.resize(frame, width=min(300, frame.shape[1]))
+aspectRatio = float(16)/9
+imageWidth = 600
+imageHeight = imageWidth / aspectRatio
+
+
+while True:
+    ret, frame = video_capture.read()
+    image = imutils.resize(frame, width=min(imageWidth, frame.shape[1]))
     orig = image.copy()
 
-    # detect people in the image
-    (people, weights) = hog.detectMultiScale(image, winStride=(4, 4),
-        padding=(8, 8), scale=1.05)
+    if track == "faces":
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    # Detect faces
-
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    faces = faceCascade.detectMultiScale(
-        gray,
-        scaleFactor=1.1,
-        minNeighbors=5,
-        minSize=(30, 30),
-        flags=cv2.cv.CV_HAAR_SCALE_IMAGE
-    )
-
-    rects = faces
+        rects = faceCascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=5,
+            minSize=(30, 30),
+            flags=cv2.cv.CV_HAAR_SCALE_IMAGE
+        )
+    elif track == "people":
+        (rects, weights) = hog.detectMultiScale(image, winStride=(4, 4),
+                                                padding=(8, 8), scale=1.05)
 
     # draw the original bounding boxes
     for (x, y, w, h) in rects:
@@ -58,19 +67,43 @@ while True:
     for (xA, yA, xB, yB) in pick:
         cv2.rectangle(image, (xA, yA), (xB, yB), (0, 255, 0), 2)
 
+    for r in rects:
+        print(r[3])
+        rect = {
+            "position": {
+                "x": float(r[0] + r[2]) / 2 / imageWidth,
+                "y": float(r[1] + r[3]) / 2 / imageHeight
+            },
+            "size":{
+                "x": float(r[2] - r[0]) / imageWidth,
+                "y": float(r[3] - r[1]) / imageHeight
+            }
+        }
+        #rect["size"] = {}
+        #rect["position"]["x"] = float(r[0] + r[2]) / 2 / imageWidth
+        #rect["position"]["y"] = float(r[1] + r[3]) / 2 / imageWidth
+
+        # pos = (float((r[0] + r[2]) / 2)/ imageWidth, (r[1] + r[3]) / 2 /
+        # imageHeight)  # np.mean(r)
+        #size = ((r[2] - r[0]) / imageWidth, (r[3] - r[1]) / imageHeight)
+
+        #averageSize = size[0] + size[1] / 2
+        print(prettyJSON(rect))
+        #print("size:", size)
+        print(r)
     # show some information on the number of bounding boxes
 
     # filename = imagePath[imagePath.rfind("/") + 1:]
 
     print("{} original boxes, {} after suppression".format(len(rects), len(pick)))
-        # Display the resulting frame
-    #cv2.imshow('Video', image)
+    # Display the resulting frame
+    cv2.imshow('Video', image)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 # When everything is done, release the capture
 video_capture.release()
-#cv2.destroyAllWindows()
+cv2.destroyAllWindows()
 
 # show the output images
 # cv2.imshow("Before NMS", orig)
