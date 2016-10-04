@@ -68,7 +68,6 @@ while True:
         cv2.rectangle(image, (xA, yA), (xB, yB), (0, 255, 0), 2)
 
     for r in rects:
-        print(r[3])
         rect = {
             "position": {
                 "x": float(r[0] + r[2]) / 2 / imageWidth,
@@ -79,23 +78,12 @@ while True:
                 "y": float(r[3] - r[1]) / imageHeight
             }
         }
-        #rect["size"] = {}
-        #rect["position"]["x"] = float(r[0] + r[2]) / 2 / imageWidth
-        #rect["position"]["y"] = float(r[1] + r[3]) / 2 / imageWidth
-
-        # pos = (float((r[0] + r[2]) / 2)/ imageWidth, (r[1] + r[3]) / 2 /
-        # imageHeight)  # np.mean(r)
-        #size = ((r[2] - r[0]) / imageWidth, (r[3] - r[1]) / imageHeight)
-
-        #averageSize = size[0] + size[1] / 2
         print(prettyJSON(rect))
-        #print("size:", size)
-        print(r)
-    # show some information on the number of bounding boxes
 
+    # show some information on the number of bounding boxes
     # filename = imagePath[imagePath.rfind("/") + 1:]
 
-    print("{} original boxes, {} after suppression".format(len(rects), len(pick)))
+    #print("{} original boxes, {} after suppression".format(len(rects), len(pick)))
     # Display the resulting frame
     cv2.imshow('Video', image)
     if cv2.waitKey(1) & 0xFF == ord('q'):
