@@ -1,9 +1,15 @@
+from __future__ import print_function
+
+
 import math
 from geometric_algorithm import *
+for y in range(0,10):
+    for x in range(0, 10):
+        a1,a2 = coordsToAngles({
+            "x": x,
+            "y": y
+        })
 
-for length in range(1, 15):
-    # print("//////")
-    print(length, coordsToAngles({
-        "x": length,
-        "y": 0
-    }))
+        print("(" + str(int(a1)) + "," + str(int(a2))+")  ", end="") 
+    print()
+

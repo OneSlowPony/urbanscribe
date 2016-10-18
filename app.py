@@ -34,18 +34,15 @@ def rawDataToAngles(data):
         bestCandidate = data[0]
 
 
-    factor = 40
+    factor = 10
     realPosition = {
         "x": bestCandidate["position"]["x"] * factor,
         "y": bestCandidate["position"]["y"] * factor
     }
 
 
-    
+
     mainServoAngle, subServoAngle = coordsToAngles(realPosition)
-
-    # print(prettyJSON(bestCandidate))
-
     return int(mainServoAngle), int(subServoAngle)
 
 @app.route('/')
@@ -59,8 +56,8 @@ def gen():
         global latestData
         latestData = data
 
-        mainServo, subServo = getCurrentServoPositions();
-        print("Main servo: " + str(mainServo) + " subservo: " + str(subServo))
+        # mainServo, subServo = getCurrentServoPositions();
+        # print("Main servo: " + str(mainServo) + " subservo: " + str(subServo))
 
         cv2.imwrite('t.jpg', peopleImage)
         yield (b'--frame\r\n'
@@ -74,6 +71,9 @@ def video_feed():
 
 def getCurrentServoPositions():
     mainServo, subServo = rawDataToAngles(latestData)
+
+    if(mainServo > 180 or subServo > 180):
+        printf("ONE OF THE SERVOS OUT OF BOUNDS")
 
     global lastMainServo
     global lastSubServo
@@ -89,6 +89,7 @@ def getCurrentServoPositions():
 @app.route('/data')
 def getData():
     mainServo,subServo = getCurrentServoPositions()
+    print("Final: " + str(mainServo) + ", " + str(subServo) + "\n")
     return str(mainServo) + "\n" + str(subServo) + "\n"
 
 @app.route('/kill')
