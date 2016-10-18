@@ -8,47 +8,46 @@ import json
 import math
 import cv2
 
-# initialize the HOG descriptor/person detector
-hog = cv2.HOGDescriptor()
-hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+# hog = cv2.HOGDescriptor()
+# hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 
-imagePath = "images/jake.jpg"
-cascPath = "haarcascade_frontalface_default.xml"
-faceCascade = cv2.CascadeClassifier(cascPath)
+faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
+
 aspectRatio = float(16)/9
-imageWidth = 600
+imageWidth = 500
 imageHeight = imageWidth / aspectRatio
 
 
 def recognisePeople(image):
-    track = "faces"
+    #track = "faces"
     imageCopy = image.copy()
     # Resize
     image = imutils.resize(image, width=min(imageWidth, image.shape[1]))
+    image = cv2.flip(image,1)
 
-    if track == "faces":
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # Comment here
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    rects = faceCascade.detectMultiScale(
+        gray,
+        scaleFactor=1.1,
+        minNeighbors=5,
+        minSize=(30, 30),
+        flags=cv2.cv.CV_HAAR_SCALE_IMAGE
+    )
 
-        rects = faceCascade.detectMultiScale(
-            gray,
-            scaleFactor=1.1,
-            minNeighbors=5,
-            minSize=(30, 30),
-            flags=cv2.cv.CV_HAAR_SCALE_IMAGE
-        )
-    elif track == "people":
-        (rects, weights) = hog.detectMultiScale(image, winStride=(4, 4),
-                                                padding=(8, 8), scale=1.05)
+    # Or here!
+    # (rects, weights) = hog.detectMultiScale(image, winStride=(4, 4),
+    #                                             padding=(8, 8), scale=1.05)
 
     # draw the original bounding boxes
-    for (x, y, w, h) in rects:
-        cv2.rectangle(imageCopy, (x, y), (x + w, y + h), (0, 0, 255), 2)
+    # for (x, y, w, h) in rects:
+    #     cv2.rectangle(imageCopy, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
     # apply non-maxima suppression to the bounding boxes using a
     # fairly large overlap threshold to try to maintain overlapping
     # boxes that are still people
     rects = np.array([[x, y, x + w, y + h] for (x, y, w, h) in rects])
-    pick = non_max_suppression(rects, probs=None, overlapThresh=0.65)
+    pick = non_max_suppression(rects, probs=None, overlapThresh=0.1)
 
     # draw the final bounding boxes
     for (xA, yA, xB, yB) in pick:
