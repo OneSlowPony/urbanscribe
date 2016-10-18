@@ -8,7 +8,7 @@ import imutils
 import cv2
 import sys
 import json
-
+import math
 
 def prettyJSON(d):
     return json.dumps(d, sort_keys=True, indent=4, separators=(',', ': '))
@@ -80,6 +80,7 @@ while True:
         }
         print(prettyJSON(rect))
 
+
     # show some information on the number of bounding boxes
     # filename = imagePath[imagePath.rfind("/") + 1:]
 
@@ -97,3 +98,5 @@ cv2.destroyAllWindows()
 # cv2.imshow("Before NMS", orig)
 # cv2.imshow("After NMS", image)
 # cv2.waitKey(0)
+
+
