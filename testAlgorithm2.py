@@ -3,13 +3,14 @@ import math
 
 def findAngle(x,y):
     if(x==0):
-        return y
+        return math.radians(90)
     elif(y==0):
-        return x
+        return math.radians(0)
     else:
-        return math.degrees(y/x)
+        return math.atan(y/x)
 
 
 
 
-print(findAngle(1,1))
+print(findAngle(0,1))
+print(math.degrees(findAngle(0,1)))

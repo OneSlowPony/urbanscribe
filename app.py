@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from flask import Flask, render_template, Response, g
 from image_recognition import *
+from geometric_algorithm import *
 import os
 
 def prettyJSON(d):
@@ -10,21 +11,57 @@ app = Flask(__name__)
 vc = cv2.VideoCapture(0)
 
 latestData = []
-lastX = 0
-lastY = 0
 
+lastMainServo = 90
+lastSubServo = 180
+
+def getPersonSize(p):
+    return p["size"]["y"]
+
+def rawDataToAngles(data):
+    arrayLength = len(data)
+    bestCandidate = {}
+
+    if(arrayLength == 0):
+        return -1, -1
+    elif(arrayLength > 1):
+        bestSize = 0
+        for o in data:
+            if(getPersonSize(o) > bestSize):
+                bestSize = getPersonSize(o)
+                bestCandidate = o
+    elif(arrayLength == 1):
+        bestCandidate = data[0]
+
+
+    factor = 40
+    realPosition = {
+        "x": bestCandidate["position"]["x"] * factor,
+        "y": bestCandidate["position"]["y"] * factor
+    }
+
+
+    
+    mainServoAngle, subServoAngle = coordsToAngles(realPosition)
+
+    # print(prettyJSON(bestCandidate))
+
+    return int(mainServoAngle), int(subServoAngle)
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
 def gen():
-    """Video streaming generator function."""
     while True:
         rval, frame = vc.read()
         peopleImage, data = recognisePeople(frame)
         global latestData
         latestData = data
+
+        mainServo, subServo = getCurrentServoPositions();
+        print("Main servo: " + str(mainServo) + " subservo: " + str(subServo))
+
         cv2.imwrite('t.jpg', peopleImage)
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + open('t.jpg', 'rb').read() + b'\r\n')
@@ -35,9 +72,24 @@ def video_feed():
     return Response(gen(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
+def getCurrentServoPositions():
+    mainServo, subServo = rawDataToAngles(latestData)
+
+    global lastMainServo
+    global lastSubServo
+
+    if(mainServo == -1):
+        mainServo = lastMainServo
+        subServo = lastSubServo
+    else:
+        lastMainServo = mainServo
+        lastSubServo = subServo
+    return mainServo, subServo
+
 @app.route('/data')
 def getData():
-    return prettyJSON(latestData)
+    mainServo,subServo = getCurrentServoPositions()
+    return str(mainServo) + "\n" + str(subServo) + "\n"
 
 @app.route('/kill')
 def kill():
