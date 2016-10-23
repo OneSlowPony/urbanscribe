@@ -14,7 +14,7 @@ import cv2
 faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 
 aspectRatio = float(16)/9
-imageWidth = 300
+imageWidth = 600 
 imageHeight = imageWidth / aspectRatio
 
 
