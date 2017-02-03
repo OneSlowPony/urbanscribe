@@ -59,10 +59,8 @@ def gen():
         # mainServo, subServo = getCurrentServoPositions();
         # print("Main servo: " + str(mainServo) + " subservo: " + str(subServo))
 
-        cv2.imwrite('t.jpg', peopleImage)
         yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + open('t.jpg', 'rb').read() + b'\r\n')
-
+               b'Content-Type: image/jpeg\r\n\r\n' + cv2.imencode('.jpg', peopleImage)[1].tostring() + b'\r\n')
 
 @app.route('/video_feed')
 def video_feed():
