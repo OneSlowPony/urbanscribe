@@ -1,1 +1,0 @@
-imagesnap snap.jpg
