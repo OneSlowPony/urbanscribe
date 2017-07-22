@@ -8,9 +8,17 @@ This project was hastily constructed for a proof-of-concept demonstration in a d
 
 # Setting up
 
+**Please note:** I am not sure of these requirements. If you require extra packages (just look what package Python references in it's errors) please file a pull request.
+
+## Mac
+
+```
+brew install numpy opencv
+```
+
 ## Ubuntu
 
-There are a lot of packages that the facial and pedestrian recognition relys on.
+There are a lot of packages that the facial and pedestrian recognition rely on.
 
 ```
 sudo apt-get -y install build-essential git cmake pkg-config
@@ -25,9 +33,12 @@ sudo apt-get -y install libgtk2.0-dev
 sudo apt-get -y install libatlas-base-dev gfortran
 sudo apt-get -y install python2.7-dev python3-dev
 sudo apt-get -y install python-opencv
+```
 
+## All platforms: Install pip depenencies
 
-sudo pip install imutils numpy
+```
+pip install -r requirements.txt
 ```
 
 # Usage
